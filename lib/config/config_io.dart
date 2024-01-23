@@ -48,12 +48,16 @@ Future<Directory> getPlatformDocumentsDirectoryPath(
     return Directory('/data/user/$userId/$applicationPackageName');
   } else if (Platform.isMacOS) {
     final applicationHomeDir = Platform.environment['HOME'];
+    print({
+      'applicationHomeDir': applicationHomeDir,
+      'rwmp': Directory.systemTemp.absolute.path,
+      'env': Platform.environment,
+    });
     return Directory('$applicationHomeDir/Documents');
   } else if (Platform.isIOS) {
-    final bundleContainerDir = File(Platform.executable).parent;
-    // This isn't documents directory but the bundle container directory of this application.
-    // Only works on iOS simulator and will not work on a real iPhone
-    return bundleContainerDir.parent;
+    final tempDirInAppDataContainer = Directory.systemTemp.absolute.path;
+    final appDocumentsDirectory = path.join(tempDirInAppDataContainer, '..', 'Documents');
+    return Directory(appDocumentsDirectory);
   } else if (Platform.isWindows) {
     // For storing app config locally for a user, windows had in the reference document to use the env variable LOCALAPPDATA.
     // Reference: https://web.archive.org/web/20120905053951/http://download.microsoft.com/download/e/6/a/e6aa654f-cccb-421e-9b50-3392e9886084/VistaFileSysNamespaces.pdf

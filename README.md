@@ -30,8 +30,7 @@ Submit a PR with your solution along with an explanation of what you did and how
 
 ## iOS
 
-- Right now, we get app's bundle container path by taking the parent path from the result of dart's `Platform.executable`. Storing files here is not right and only seems to be working on iOS simulator.
-- The app's document data directory is in data container director which requires knowning app separate UUID for data container. I couldn't find a way to get it this UUID or data container path. 
+- Right now, we get app's app container path by taking the parent path from the path of `Directory.systemTemp`. The `/Documents` directory inside is the platform's document directory for this application.
 - Reference: "iOS Standard Directories: Where Files Reside" section in https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html
 
 ## MacOS
