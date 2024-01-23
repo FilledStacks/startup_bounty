@@ -10,7 +10,7 @@ If you can implement this functionality I will send you $100 USD
 
 - If you write the data to a file, the path has to come from the official documents directory for the platform it's running on
 
-- You can't use a backend solution as it would be too difficult to implement
+- You can't use a backend solutions
 
 ## Submission
 
