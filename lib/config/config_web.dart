@@ -34,6 +34,11 @@ class _AppConfigWeb extends AppConfig {
     if (config == null) return;
     _cachedConfig = json.decode(config);
   }
+
+  @override
+  String toString() {
+    return '_AppConfigWeb: Storing data in window.localStorage["app_config"]';
+  }
 }
 
 Future<AppConfig> getAppConfig(String packageName) async {

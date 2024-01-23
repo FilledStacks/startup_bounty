@@ -59,11 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() async {
     // TASK: Change the value here and save
+    // update value in the same config file
+    await configFile.setValue('use_flutter_driver', true);
     setState(() {
       _counter++;
     });
-    // update value in the same config file
-    await configFile.setValue('use_flutter_driver', true);
   }
 
   @override
@@ -90,6 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     .toString(),
               ),
               subtitle: const Text('use_flutter_driver'),
+            ),
+            ListTile(
+              title: Text(
+                configFile.toString(),
+              ),
+              subtitle: const Text('config_file_location'),
             ),
           ],
         ),

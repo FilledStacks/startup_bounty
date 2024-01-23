@@ -30,6 +30,11 @@ class _AppConfigIO extends AppConfig {
     if (content.isEmpty) return;
     _cachedConfig = json.decode(content);
   }
+
+  @override
+  String toString() {
+    return '_AppConfigIO: Storing data in ${_configJsonFile.absolute.path}';
+  }
 }
 
 /// Returns Application documents directory for a platform before `WidgetsFlutterBinding.ensureInitialized` or `runApp`
