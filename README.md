@@ -15,3 +15,7 @@ If you can implement this functionality I will send you $100 USD
 ## Submission
 
 Submit a PR with your solution along with an explanation of what you did and how it works.
+
+## This is my solution
+
+You can store data in a file, and after launching the app, you can retrieve your data.
