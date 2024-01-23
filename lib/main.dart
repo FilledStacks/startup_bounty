@@ -8,6 +8,7 @@ const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 final Box<SettingsData> hiveBx = Hive.box<SettingsData>('settings');
 Future<void> main() async {
   //register adapter
+  await Hive.initFlutter();
   Hive.registerAdapter(SettingsDataAdapter());
   Box<SettingsData?> settingsBox;
   try {
