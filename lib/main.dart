@@ -8,13 +8,6 @@ const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
 Future<void> main() async {
   // TASK: Read this value from a local storage
-  final useFlutterDriver = true;
-
-  if (!useFlutterDriver) {
-    // WidgetsFlutterBinding.ensureInitialized();
-  } else {
-    enableFlutterDriverExtension();
-  }
 
   runApp(const MyApp());
 }
@@ -68,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Check if the file exists, create and write content if not
     if (!(await file.exists())) {
       await file.create();
-      await file.writeAsString('Thank you Mom and Papa!!');
+      await file.writeAsString('true');
     }
 
     return file;
@@ -97,10 +90,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 future: readValueAsync(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    WidgetsFlutterBinding.ensureInitialized();
 
                     String value = snapshot.data!;
                     print('Read value before initialization: $value');
+
+                    if(value == 'true'){
+                      WidgetsFlutterBinding.ensureInitialized();
+                    }else{
+                      enableFlutterDriverExtension();
+                    }
 
                     // Return your main widget here
                     return Text(value);
