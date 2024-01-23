@@ -43,9 +43,9 @@ Future<Directory> getPlatformDocumentsDirectoryPath(
   String applicationPackageName,
 ) async {
   if (Platform.isAndroid) {
-    // This can be different if new accounts were created on android
-    const userId = 0;
-    return Directory('/data/user/$userId/$applicationPackageName');
+    final tempDirInAppDataContainer = Directory.systemTemp.absolute.path;
+    final appDocumentsDirectory = path.normalize(path.join(tempDirInAppDataContainer, '..', 'files'));
+    return Directory(appDocumentsDirectory);
   } else if (Platform.isIOS || Platform.isMacOS) {
     final tempDirInAppDataContainer = Directory.systemTemp.absolute.path;
     final appDocumentsDirectory = path.normalize(path.join(tempDirInAppDataContainer, '..', 'Documents'));
