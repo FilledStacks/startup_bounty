@@ -28,6 +28,7 @@ Submit a PR with your solution along with an explanation of what you did and how
 - Android official APIs provide `/data/user/<userId>/<appPackageName>` as the application's storage directory.
 - This path isn't mentioned in the API's documentation at https://developer.android.com/training/data-storage but mentioned in the Device paths section of Testing Multiple Users for app storage https://source.android.com/docs/devices/admin/multi-user-testing#device-paths
 - The `Directory.systemTemp` returns a cache path `code_cache/` inside the app's storage directory. I return the `files/` directory inside the parent directory of the systemTemp path to be used as app's data document directory. 
+- The `files/` directory inside of app's data directory (storage directory) is returned for storing config files like how path_provider gets data files directory from flutter PathUtil java https://github.com/flutter/engine/blob/57d6b518f9205027256391e3c71529ee510598cf/shell/platform/android/io/flutter/util/PathUtils.java#L17
 
 ## iOS & MacOS
 
