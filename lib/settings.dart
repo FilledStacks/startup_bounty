@@ -1,9 +1,11 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 class SettingsData {
-  final bool useFlutterDriver;
-  const SettingsData({
+  bool useFlutterDriver;
+  bool isInitialized;
+  SettingsData({
     required this.useFlutterDriver,
+    this.isInitialized = false,
   });
 }
 
@@ -24,5 +26,6 @@ class SettingsDataAdapter extends TypeAdapter<SettingsData> {
   @override
   void write(BinaryWriter writer, SettingsData obj) {
     writer.writeBool(obj.useFlutterDriver);
+    writer.writeBool(obj.isInitialized);
   }
 }

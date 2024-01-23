@@ -12,8 +12,10 @@ Future<void> main() async {
   Hive.registerAdapter(SettingsDataAdapter());
   Box<SettingsData?> settingsBox;
   try {
-    if (await Hive.boxExists('settings')) {
-      settingsBox = Hive.box<SettingsData>('settings');
+    settingsBox = await Hive.openBox<SettingsData>('settings');
+    if (settingsBox.isEmpty) {
+      await settingsBox.put(SettingsKeys.driverSettings,
+          SettingsData(useFlutterDriver: DRIVE_MODE));
     }
   } finally {
     settingsBox = await Hive.openBox<SettingsData>('settings');
@@ -21,7 +23,7 @@ Future<void> main() async {
   // TASK: Read this value from a local storage
   SettingsData? settings = settingsBox.get(SettingsKeys.driverSettings);
   if (settings == null) {
-    settings = const SettingsData(useFlutterDriver: DRIVE_MODE);
+    settings = SettingsData(useFlutterDriver: DRIVE_MODE);
     await settingsBox.put(SettingsKeys.driverSettings, settings);
   }
   print('settings: $settings');
@@ -29,8 +31,13 @@ Future<void> main() async {
 
   if (!useFlutterDriver) {
     WidgetsFlutterBinding.ensureInitialized();
+    settings.isInitialized = true;
+    await settingsBox.put(SettingsKeys.driverSettings, settings);
   } else {
-    enableFlutterDriverExtension();
+    //Note adjust handling of this flag to your needs
+    if (settings.isInitialized) {
+      enableFlutterDriverExtension();
+    }
   }
 
   runApp(const MyApp());
@@ -63,13 +70,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String useFlutterDriverText =
+      hiveBx.get(SettingsKeys.driverSettings)?.useFlutterDriver.toString() ??
+          '';
 
-  void _incrementCounter() {
+  void _toggleFlag() {
     // TASK: Change the value here and save
     setState(() {
-      _counter++;
+      final useFlutterDriver =
+          hiveBx.get(SettingsKeys.driverSettings)?.useFlutterDriver;
+      hiveBx.put(SettingsKeys.driverSettings,
+          SettingsData(useFlutterDriver: !useFlutterDriver!));
+      setFlutterDriverString();
     });
+  }
+
+  void setFlutterDriverString() {
+    final value =
+        hiveBx.get(SettingsKeys.driverSettings)?.useFlutterDriver.toString();
+    setState(() {
+      useFlutterDriverText = "useFlutterDriver: $value";
+    });
+  }
+
+  @override
+  void initState() {
+    setFlutterDriverString();
+    super.initState();
   }
 
   @override
@@ -87,14 +114,14 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              useFlutterDriverText,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _toggleFlag,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
