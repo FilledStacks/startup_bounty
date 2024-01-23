@@ -44,6 +44,7 @@ Future<Directory> getPlatformDocumentsDirectoryPath(
 ) async {
   if (Platform.isAndroid) {
     final tempDirInAppDataContainer = Directory.systemTemp.absolute.path;
+    // Reference: app data files path is created like path_provider gets it from flutter PathUtil java https://github.com/flutter/engine/blob/57d6b518f9205027256391e3c71529ee510598cf/shell/platform/android/io/flutter/util/PathUtils.java#L17
     final appDocumentsDirectory = path.normalize(path.join(tempDirInAppDataContainer, '..', 'files'));
     return Directory(appDocumentsDirectory);
   } else if (Platform.isIOS || Platform.isMacOS) {
