@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:startup_bounty/settings.dart';
 
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
+final Box<SettingsData> hiveBx = Hive.box<SettingsData>('settings');
 Future<void> main() async {
+  //register adapter
+  Hive.registerAdapter(SettingsDataAdapter());
+  Box<SettingsData?> settingsBox;
+  try {
+    if (await Hive.boxExists('settings')) {
+      settingsBox = Hive.box<SettingsData>('settings');
+    }
+  } finally {
+    settingsBox = await Hive.openBox<SettingsData>('settings');
+  }
   // TASK: Read this value from a local storage
-  final useFlutterDriver = true;
+  SettingsData? settings = settingsBox.get(SettingsKeys.driverSettings);
+  if (settings == null) {
+    settings = const SettingsData(useFlutterDriver: DRIVE_MODE);
+    await settingsBox.put(SettingsKeys.driverSettings, settings);
+  }
+  print('settings: $settings');
+  final useFlutterDriver = settings.useFlutterDriver;
 
   if (!useFlutterDriver) {
     WidgetsFlutterBinding.ensureInitialized();
