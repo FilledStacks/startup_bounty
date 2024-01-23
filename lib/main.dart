@@ -92,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: const Text('use_flutter_driver'),
             ),
             ListTile(
-              title: Text(
+              title: SelectableText(
                 configFile.toString(),
               ),
               subtitle: const Text('config_file_location'),

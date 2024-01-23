@@ -28,15 +28,10 @@ Submit a PR with your solution along with an explanation of what you did and how
 - Android official APIs provide `/data/user/<userId>/<appPackageName>` as the application's documents directory.
 - This path isn't mentioned in the API's documentation at https://developer.android.com/training/data-storage but mentioned in the Device paths section of Testing Multiple Users for app storage https://source.android.com/docs/devices/admin/multi-user-testing#device-paths  
 
-## iOS
+## iOS & MacOS
 
 - Right now, we get app's app container path by taking the parent path from the path of `Directory.systemTemp`. The `/Documents` directory inside is the platform's document directory for this application.
-- Reference: "iOS Standard Directories: Where Files Reside" section in https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html
-
-## MacOS
-
-- I observed that in release mode, the environment variable `HOME` returns the app's data container location.
-- Reference: "macOS Standard Directories: Where Files Reside" section in https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html
+- Reference: https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html & https://cocoacasts.com/fm-1-how-to-get-documents-directory-in-swift
 
 ## Windows
 

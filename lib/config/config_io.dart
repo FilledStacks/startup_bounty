@@ -46,17 +46,9 @@ Future<Directory> getPlatformDocumentsDirectoryPath(
     // This can be different if new accounts were created on android
     const userId = 0;
     return Directory('/data/user/$userId/$applicationPackageName');
-  } else if (Platform.isMacOS) {
-    final applicationHomeDir = Platform.environment['HOME'];
-    print({
-      'applicationHomeDir': applicationHomeDir,
-      'rwmp': Directory.systemTemp.absolute.path,
-      'env': Platform.environment,
-    });
-    return Directory('$applicationHomeDir/Documents');
-  } else if (Platform.isIOS) {
+  } else if (Platform.isIOS || Platform.isMacOS) {
     final tempDirInAppDataContainer = Directory.systemTemp.absolute.path;
-    final appDocumentsDirectory = path.join(tempDirInAppDataContainer, '..', 'Documents');
+    final appDocumentsDirectory = path.normalize(path.join(tempDirInAppDataContainer, '..', 'Documents'));
     return Directory(appDocumentsDirectory);
   } else if (Platform.isWindows) {
     // For storing app config locally for a user, windows had in the reference document to use the env variable LOCALAPPDATA.
