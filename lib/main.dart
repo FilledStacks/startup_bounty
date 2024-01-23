@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:io' as io;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
@@ -10,15 +9,17 @@ import 'package:path/path.dart' as path;
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 const applicationPackageName = 'com.example.startup_bounty';
 
+AppConfig? configFile;
+
+const useFlutterDriverKey = 'use_flutter_driver';
+
 Future<void> main() async {
-  final configFile = await AppConfig.getConfig(applicationPackageName);
+  configFile = await AppConfig.getConfig(applicationPackageName);
   // TASK: Read this value from a local storage
   final useFlutterDriver =
-      configFile?.getValue<bool>('use_flutter_driver') == true;
-  if (configFile != null) {
-    await configFile.setValue('use_flutter_driver', true);
-  }
+      configFile?.getValue<bool>(useFlutterDriverKey) == true;
 
+  // Observe value from config file here
   print({'useFlutterDriver': useFlutterDriver});
 
   if (!useFlutterDriver) {
@@ -27,6 +28,7 @@ Future<void> main() async {
     enableFlutterDriverExtension();
   }
 
+  // press the + increment button in UI to update this value to true.
   runApp(const MyApp());
 }
 
@@ -59,11 +61,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
     // TASK: Change the value here and save
     setState(() {
       _counter++;
     });
+    // update value in the same config file
+    await configFile!.setValue('use_flutter_driver', true);
   }
 
   @override
@@ -84,18 +88,11 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            FutureBuilder(
-              future: AppConfig.getConfig(applicationPackageName),
-              builder: (context, snapshot) {
-                return ListTile(
-                  title: Text(
-                    snapshot.data
-                            ?.getValue<bool>('use_flutter_driver')
-                            .toString() ??
-                        '-',
-                  ),
-                );
-              },
+            ListTile(
+              title: Text(
+                  configFile?.getValue<bool>(useFlutterDriverKey)?.toString() ??
+                      '-'),
+              subtitle: const Text('use_flutter_driver'),
             ),
           ],
         ),
@@ -114,7 +111,9 @@ class _MyHomePageState extends State<MyHomePage> {
 //   return path_provider.getApplicationDocumentsDirectory();
 // }
 
-Future<Directory?> getPlatformDocumentsDirectoryPath(
+/// Returns Application documents directory for a platform before `WidgetsFlutterBinding.ensureInitialized` or `runApp`
+/// is used.
+Future<Directory> getPlatformDocumentsDirectoryPath(
   String applicationPackageName,
 ) async {
   if (Platform.isAndroid) {
@@ -141,9 +140,8 @@ class AppConfig {
   static Future<AppConfig?> getConfig(String applicationPackageName) async {
     final file = await getApplicationConfigFile(applicationPackageName);
     print({
-      "config file path": file?.absolute.path,
+      "config file path": file.absolute.path,
     });
-    if (file == null) return null;
     final content = await file.readAsString();
     final Map<String, Object?> contentJson =
         content.isEmpty ? {} : json.decode(content);
@@ -164,13 +162,24 @@ class AppConfig {
   }
 }
 
-Future<File?> getApplicationConfigFile(String applicationPackageName) async {
-  final documentsDirectory =
-      await getPlatformDocumentsDirectoryPath(applicationPackageName);
-  print({
-    'application documents dir': documentsDirectory?.absolute.path,
-  });
-  if (documentsDirectory != null) {
+class AppConfigSetupFailure extends Error {
+  final String message;
+  AppConfigSetupFailure(this.message);
+
+  @override
+  String toString() {
+    return 'AppConfigSetupFailure: $message';
+  }
+}
+
+/// Returns path of config file that is inside application's official document directory
+Future<File> getApplicationConfigFile(String applicationPackageName) async {
+  try {
+    final documentsDirectory =
+        await getPlatformDocumentsDirectoryPath(applicationPackageName);
+    print({
+      'application documents dir': documentsDirectory.absolute.path,
+    });
     await documentsDirectory.create(recursive: true);
     final configJsonFile = File(
       path.join(documentsDirectory.path, 'app_config.json'),
@@ -179,6 +188,9 @@ Future<File?> getApplicationConfigFile(String applicationPackageName) async {
       await configJsonFile.create();
     }
     return configJsonFile;
+  } catch (e, s) {
+    debugPrint(e.toString());
+    debugPrintStack(stackTrace: s);
   }
-  return null;
+  throw AppConfigSetupFailure('Could not find app config file directory');
 }
