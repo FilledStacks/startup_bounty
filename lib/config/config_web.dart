@@ -47,5 +47,7 @@ class _AppConfigWeb extends AppConfig {
 }
 
 Future<AppConfig> getAppConfig(String packageName) async {
-  return _AppConfigWeb(html.window.localStorage).._load();
+  final config = _AppConfigWeb(html.window.localStorage);
+  await config._load();
+  return config;
 }
