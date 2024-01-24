@@ -1,25 +1,50 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:path_provider/path_provider.dart';
 
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
 Future<void> main() async {
-  // TASK: Read this value from a local storage
-  final useFlutterDriver = true;
+  runApp(const MyApp()); // runApp initializes WidgetsFlutterBinding
 
-  if (!useFlutterDriver) {
-    WidgetsFlutterBinding.ensureInitialized();
+  if (!DRIVE_MODE) {
+    await initializeValues(); // Initialize values from disk
   } else {
     enableFlutterDriverExtension();
   }
-
-  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+Future<void> initializeValues() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/TextFile.txt';
 
-  // This widget is the root of your application.
+    final file = File(filePath);
+
+    if (await file.exists()) {
+      log('File exists at: $filePath');
+
+      final content = await file.readAsString();
+      log('File content: $content');
+
+      // Use the content as needed.
+    } else {
+      log('File does not exist at: $filePath');
+    }
+  } catch (e, stackTrace) {
+    log('Error initializing values: $e');
+    log('Stack trace: $stackTrace');
+  }
+}
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
