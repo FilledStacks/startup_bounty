@@ -97,6 +97,17 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               subtitle: const Text('config_file_location'),
             ),
+            FutureBuilder(
+              future: configFile.fetchDataFromSource(),
+              builder: (context, snapshot) {
+                return ListTile(
+                  title: SelectableText(
+                    snapshot.data.toString(),
+                  ),
+                  subtitle: const Text('data from config_file'),
+                );
+              },
+            ),
           ],
         ),
       ),

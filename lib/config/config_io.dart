@@ -25,10 +25,15 @@ class _AppConfigIO extends AppConfig {
     await _configJsonFile.writeAsString(json.encode(_cachedConfig));
   }
 
+  @override
+  Future<Map<String, Object?>?> fetchDataFromSource() async {
+    final data = await _configJsonFile.readAsString();
+    if (data.isEmpty) return null;
+    return json.decode(data);
+  }
+
   Future<void> _load() async {
-    final content = await _configJsonFile.readAsString();
-    if (content.isEmpty) return;
-    _cachedConfig = json.decode(content);
+    _cachedConfig = await fetchDataFromSource() ?? {};
   }
 
   @override
@@ -86,5 +91,7 @@ Future<File> getApplicationConfigFile(String packageName) async {
 
 Future<AppConfig> getAppConfig(String packageName) async {
   final file = await getApplicationConfigFile(packageName);
-  return _AppConfigIO._(file).._load();
+  final config = _AppConfigIO._(file);
+  await config._load();
+  return config;
 }

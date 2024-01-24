@@ -29,10 +29,15 @@ class _AppConfigWeb extends AppConfig {
     _configStorage['app_config'] = json.encode(_cachedConfig);
   }
 
-  void _load() async {
-    final config = _configStorage['app_config'];
-    if (config == null) return;
-    _cachedConfig = json.decode(config);
+  @override
+  Future<Map<String, Object?>?> fetchDataFromSource() async {
+    final data = _configStorage['app_config'];
+    if (data == null || data.isEmpty) return null;
+    return json.decode(data);
+  }
+
+  Future<void> _load() async {
+    _cachedConfig = await fetchDataFromSource() ?? {};
   }
 
   @override

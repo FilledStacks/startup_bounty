@@ -5,6 +5,8 @@ abstract class AppConfig {
 
   Future<void> setValue(String key, Object? value);
 
+  Future<Map<String, Object?>?> fetchDataFromSource();
+
   /// Returns platform specific app config file. Getting this doesn't require
   /// `WidgetsFlutterBinding.ensureInitialized()` to be called.
   static Future<AppConfig> getAppConfig(String packageName) {
