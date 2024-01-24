@@ -7,7 +7,7 @@ const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 Future<void> main() async {
   // runApp(Container()) runs an empty Flutter app, which initializes the bindings
   // please note that this is a workaround and not a recommended practice. The recommended way to initialize the bindings is by calling WidgetsFlutterBinding.ensureInitialized()
-  runApp(Container());
+  runApp(const SizedBox());
 
   final prefs = await SharedPreferences.getInstance();
   final getUsername = prefs.getString('username') ?? '';
