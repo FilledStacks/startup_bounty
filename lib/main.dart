@@ -1,18 +1,18 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 // add path provider
 import 'package:path_provider/path_provider.dart';
+import 'dart:html' as html;
 
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
 Future<void> main() async {
   // TASK: Read this value from a local storage
-  final value = readValueSync('${getDocumentsDirPath()}/counter.txt');
+  final value = readData();
   final useFlutterDriver = value == 'true' || DRIVE_MODE;
-
-  print("The value is $value");
 
   if (!useFlutterDriver) {
     WidgetsFlutterBinding.ensureInitialized();
@@ -20,11 +20,13 @@ Future<void> main() async {
     enableFlutterDriverExtension();
   }
 
-  runApp(const MyApp());
+  runApp(MyApp(value: value));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.value});
+
+  final String value;
 
   // This widget is the root of your application.
   @override
@@ -35,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Value from local storage: $value'),
     );
   }
 }
@@ -64,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
     bool state = _counter % 2 == 0;
-    writeToTile('counter.txt', state.toString());
+    writeToFile('counter.txt', state.toString());
   }
 
   @override
@@ -79,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'When the counter is even, the value is true, otherwise false',
             ),
             Text(
               '$_counter',
@@ -97,6 +99,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+String readData() {
+  if (kIsWeb) {
+    return html.window.localStorage['counter.txt'] ?? 'false';
+  }
+  return readValueSync('${getDocumentsDirPath()}/counter.txt');
+}
+
 String getDocumentsDirPath() {
   return Directory.systemTemp.path;
 }
@@ -106,11 +115,14 @@ String readValueSync(String filePath) {
   return file.existsSync() ? file.readAsStringSync() : 'false';
 }
 
-void writeToTile(String fileName, String fileData) async {
+void writeToFile(String fileName, String fileData) async {
+  if (kIsWeb) {
+    html.window.localStorage[fileName] = fileData;
+    return;
+  }
   final file = File('${getDocumentsDirPath()}/$fileName');
   file.writeAsStringSync(fileData);
 
-  // // Write to actual documents
   final appDocuments = await getApplicationDocumentsDirectory();
   final appDocumentsDir = appDocuments.path;
   final appFile = File('$appDocumentsDir/$fileName');
@@ -118,6 +130,9 @@ void writeToTile(String fileName, String fileData) async {
 }
 
 void checkDocumentsForFileIfItExistsSaveToTemp(String fileString) async {
+  if (kIsWeb) {
+    return;
+  }
   final appDocuments = await getApplicationDocumentsDirectory();
   final appDocumentsDir = appDocuments.path;
   final appFile = File('$appDocumentsDir/$fileString');
