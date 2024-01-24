@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 
+import 'config/config.dart';
+
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
+const applicationPackageName = 'com.example.startup_bounty';
+
+late final AppConfig configFile;
+
+const useFlutterDriverKey = 'use_flutter_driver';
+
 Future<void> main() async {
+  configFile = await AppConfig.getAppConfig(applicationPackageName);
+
   // TASK: Read this value from a local storage
-  final useFlutterDriver = true;
+  final useFlutterDriver =
+      configFile.getValue<bool>(useFlutterDriverKey) == true;
 
   if (!useFlutterDriver) {
     WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +24,7 @@ Future<void> main() async {
     enableFlutterDriverExtension();
   }
 
+  // press the + increment button in UI to update this value to true.
   runApp(const MyApp());
 }
 
@@ -45,8 +57,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
     // TASK: Change the value here and save
+    // update value in the same config file
+    await configFile.setValue('use_flutter_driver', true);
     setState(() {
       _counter++;
     });
@@ -69,6 +83,30 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            ListTile(
+              title: Text(
+                (configFile.getValue<bool>(useFlutterDriverKey) == true)
+                    .toString(),
+              ),
+              subtitle: const Text('use_flutter_driver'),
+            ),
+            ListTile(
+              title: SelectableText(
+                configFile.toString(),
+              ),
+              subtitle: const Text('config_file_location'),
+            ),
+            FutureBuilder(
+              future: configFile.fetchDataFromSource(),
+              builder: (context, snapshot) {
+                return ListTile(
+                  title: SelectableText(
+                    snapshot.data.toString(),
+                  ),
+                  subtitle: const Text('data from config_file'),
+                );
+              },
             ),
           ],
         ),
