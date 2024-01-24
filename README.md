@@ -1,4 +1,8 @@
-# Startup Bounty
+# Startup Bounty (Collected)
+
+---
+The bounty has been collected and the functionality has been merged. Thanks to everyone that submitted a PR. 
+---
 
 I need to read a value from disk, and I haven't been able to do that. 
 
