@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 
+import 'utils.dart';
+
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
 Future<void> main() async {
-  // TASK: Read this value from a local storage
-  final useFlutterDriver = true;
-
-  if (!useFlutterDriver) {
-    WidgetsFlutterBinding.ensureInitialized();
-  } else {
-    enableFlutterDriverExtension();
-  }
-
-  runApp(const MyApp());
+  return await readValue().then((useFlutterDriver) {
+    if (!useFlutterDriver) {
+      WidgetsFlutterBinding.ensureInitialized();
+    } else {
+      enableFlutterDriverExtension();
+    }
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -43,13 +43,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  bool useFlutterDriver = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Reading value from file and initializing varialble `useFlutterDriver`
+    readValue().then((value) => useFlutterDriver = value);
+  }
 
   void _incrementCounter() {
-    // TASK: Change the value here and save
-    setState(() {
-      _counter++;
+    // Toggling value between true and false
+    useFlutterDriver = !useFlutterDriver;
+    saveValue(useFlutterDriver).whenComplete(() {
+      debugPrint(
+        "Toggled `useFlutterDriver` value to: $useFlutterDriver",
+      );
     });
+    setState(() {});
   }
 
   @override
@@ -57,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text("Flutter Driver Challange"),
       ),
       body: Center(
         child: Column(
@@ -67,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              '$useFlutterDriver',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
