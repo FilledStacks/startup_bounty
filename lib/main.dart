@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const bool DRIVE_MODE = bool.fromEnvironment('DRIVE_MODE');
 
 Future<void> main() async {
-  // TASK: Read this value from a local storage
-  final useFlutterDriver = true;
+  // runApp(Container()) runs an empty Flutter app, which initializes the bindings
+  // please note that this is a workaround and not a recommended practice. The recommended way to initialize the bindings is by calling WidgetsFlutterBinding.ensureInitialized()
+  runApp(Container());
 
+  final prefs = await SharedPreferences.getInstance();
+  final getUsername = prefs.getString('username') ?? '';
+  if(getUsername.isEmpty) {
+    prefs.setString('username', 'sarfaraj');
+  }
+  print("Username = $getUsername");
+  final useFlutterDriver = true;
   if (!useFlutterDriver) {
     WidgetsFlutterBinding.ensureInitialized();
   } else {
